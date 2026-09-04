@@ -1,11 +1,5 @@
-package app;
-
-
-
 import java.util.Map;
 import java.util.Scanner;
-
-import booking.BookingManager;
 
 /**
  * Main Console Application for Movie Ticket Booking System (Java + DSA Assessment).
@@ -456,4 +450,3 @@ public class MovieBookingApp {
         );
     }
 }
-

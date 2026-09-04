@@ -6,19 +6,14 @@ echo Compiling the project...
 if exist bin rmdir /s /q bin
 mkdir bin
 
-dir /s /b src\*.java > sources.txt
-
-javac -d bin @sources.txt
+javac -d bin src\*.java
 
 if errorlevel 1 (
     echo.
     echo Compilation failed!
-    del sources.txt
     pause
-    exit /b
+    exit /b %errorlevel%
 )
-
-del sources.txt
 
 echo.
 echo Compilation successful!
@@ -26,6 +21,6 @@ echo.
 echo Starting Movie Booking System...
 echo.
 
-java -cp bin app.MovieBookingApp
+java -cp bin MovieBookingApp
 
 pause

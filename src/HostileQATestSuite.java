@@ -1,17 +1,6 @@
-package test;
-
 import java.util.Map;
 import java.util.List;
 import java.util.stream.IntStream;
-
-import booking.BookingManager;
-import booking.BookingManager.InvalidCustomerException;
-import booking.BookingManager.InvalidSeatException;
-import booking.BookingManager.InvalidTheaterDimensionsException;
-import booking.BookingManager.MovieBookingException;
-import booking.BookingManager.SeatAlreadyBookedException;
-import booking.BookingManager.SeatNotBookedException;
-import seat.SeatMap2D;
 
 /**
  * Hostile QA Test Suite designed to rigorously stress-test the system across 20 test cases.
@@ -179,12 +168,12 @@ public class HostileQATestSuite {
             boolean caughtSeat = false;
             try {
                 manager.bookSeatWithException("A1", "");
-            } catch (InvalidCustomerException e) {
+            } catch (BookingManager.InvalidCustomerException e) {
                 caughtCustomer = true;
             }
             try {
                 manager.bookSeatWithException("ZZ9", "ValidName");
-            } catch (InvalidSeatException e) {
+            } catch (BookingManager.InvalidSeatException e) {
                 caughtSeat = true;
             }
             return caughtCustomer && caughtSeat && manager.verifyStateConsistency();
@@ -198,12 +187,12 @@ public class HostileQATestSuite {
             boolean caughtUnbooked = false;
             try {
                 manager.bookSeatWithException("A1", "SecondUser");
-            } catch (SeatAlreadyBookedException e) {
+            } catch (BookingManager.SeatAlreadyBookedException e) {
                 caughtDouble = true;
             }
             try {
                 manager.cancelSeatWithException("E8"); // Not booked
-            } catch (SeatNotBookedException e) {
+            } catch (BookingManager.SeatNotBookedException e) {
                 caughtUnbooked = true;
             }
             return caughtDouble && caughtUnbooked && manager.verifyStateConsistency();
