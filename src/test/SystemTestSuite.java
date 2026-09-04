@@ -1,3 +1,16 @@
+package test;
+
+import java.util.List;
+import java.util.Map;
+
+import booking.BookingManager;
+import booking.BookingManager.InvalidCustomerException;
+import booking.BookingManager.InvalidSeatException;
+import booking.BookingManager.MovieBookingException;
+import booking.BookingManager.SeatAlreadyBookedException;
+import booking.BookingManager.SeatNotBookedException;
+import seat.SeatMap2D;
+
 /**
  * Automated System Test Suite for the Movie Ticket Booking System.
  *
@@ -11,6 +24,8 @@
  * - Cancellation
  * - Occupancy calculation
  * - Multi-data-structure consistency
+ * - Custom Exception Handling (4+ custom exceptions)
+ * - Stream API Operations
  *
  * Each test creates its own BookingManager to ensure complete test isolation.
  */
@@ -23,11 +38,11 @@ public class SystemTestSuite {
     public static void main(String[] args) {
 
         System.out.println("=================================================");
-        System.out.println(" 🧪 RUNNING 12-POINT AUTOMATED SYSTEM TEST SUITE");
+        System.out.println(" 🧪 RUNNING AUTOMATED SYSTEM TEST SUITE");
         System.out.println("=================================================\n");
 
         int passed = 0;
-        int total = 12;
+        int total = 17;
 
         // -------------------------------------------------
         // TC01: Initial state
@@ -393,6 +408,135 @@ public class SystemTestSuite {
 
             System.out.println(
                     "TC12: Consistency Check -> FAILED"
+            );
+        }
+
+        // -------------------------------------------------
+        // TC13: Custom Exception - InvalidCustomerException
+        // -------------------------------------------------
+
+        BookingManager tc13 = createManager();
+        boolean threwInvalidCustomer = false;
+        try {
+            tc13.bookSeatWithException("A1", "   ");
+        } catch (InvalidCustomerException e) {
+            threwInvalidCustomer = true;
+        } catch (Exception e) {
+            threwInvalidCustomer = false;
+        }
+
+        if (threwInvalidCustomer && tc13.verifyStateConsistency()) {
+            System.out.println(
+                    "TC13: Custom Exception [InvalidCustomerException] -> PASSED"
+            );
+            passed++;
+        } else {
+            System.out.println(
+                    "TC13: Custom Exception [InvalidCustomerException] -> FAILED"
+            );
+        }
+
+        // -------------------------------------------------
+        // TC14: Custom Exception - InvalidSeatException
+        // -------------------------------------------------
+
+        BookingManager tc14 = createManager();
+        boolean threwInvalidSeat = false;
+        try {
+            tc14.bookSeatWithException("Z99", "Customer");
+        } catch (InvalidSeatException e) {
+            threwInvalidSeat = true;
+        } catch (Exception e) {
+            threwInvalidSeat = false;
+        }
+
+        if (threwInvalidSeat && tc14.verifyStateConsistency()) {
+            System.out.println(
+                    "TC14: Custom Exception [InvalidSeatException] -> PASSED"
+            );
+            passed++;
+        } else {
+            System.out.println(
+                    "TC14: Custom Exception [InvalidSeatException] -> FAILED"
+            );
+        }
+
+        // -------------------------------------------------
+        // TC15: Custom Exception - SeatAlreadyBookedException
+        // -------------------------------------------------
+
+        BookingManager tc15 = createManager();
+        boolean threwDoubleBooking = false;
+        try {
+            tc15.bookSeatWithException("A1", "Alice");
+            tc15.bookSeatWithException("A1", "Bob");
+        } catch (SeatAlreadyBookedException e) {
+            threwDoubleBooking = true;
+        } catch (Exception e) {
+            threwDoubleBooking = false;
+        }
+
+        if (threwDoubleBooking && tc15.verifyStateConsistency()) {
+            System.out.println(
+                    "TC15: Custom Exception [SeatAlreadyBookedException] -> PASSED"
+            );
+            passed++;
+        } else {
+            System.out.println(
+                    "TC15: Custom Exception [SeatAlreadyBookedException] -> FAILED"
+            );
+        }
+
+        // -------------------------------------------------
+        // TC16: Custom Exception - SeatNotBookedException
+        // -------------------------------------------------
+
+        BookingManager tc16 = createManager();
+        boolean threwSeatNotBooked = false;
+        try {
+            tc16.cancelSeatWithException("B3");
+        } catch (SeatNotBookedException e) {
+            threwSeatNotBooked = true;
+        } catch (Exception e) {
+            threwSeatNotBooked = false;
+        }
+
+        if (threwSeatNotBooked && tc16.verifyStateConsistency()) {
+            System.out.println(
+                    "TC16: Custom Exception [SeatNotBookedException] -> PASSED"
+            );
+            passed++;
+        } else {
+            System.out.println(
+                    "TC16: Custom Exception [SeatNotBookedException] -> FAILED"
+            );
+        }
+
+        // -------------------------------------------------
+        // TC17: Java Stream API Integration Verification
+        // -------------------------------------------------
+
+        BookingManager tc17 = createManager();
+        tc17.bookSeat("B2", "John Doe");
+        tc17.bookSeat("A1", "Alice Smith");
+        tc17.bookSeat("C3", "John Doe");
+
+        List<String> sortedSeats = tc17.getSortedBookedSeats();
+        Map<String, String> johnBookings = tc17.searchBookingsByCustomer("John");
+        List<String> availableList = tc17.getAllAvailableSeatIds();
+
+        boolean streamSortedCorrect = sortedSeats.size() == 3 && sortedSeats.get(0).equals("A1") && sortedSeats.get(1).equals("B2") && sortedSeats.get(2).equals("C3");
+        boolean streamSearchCorrect = johnBookings.size() == 2 && johnBookings.containsKey("B2") && johnBookings.containsKey("C3");
+        boolean streamAvailableCorrect = availableList.size() == 37 && !availableList.contains("A1");
+
+        if (streamSortedCorrect && streamSearchCorrect && streamAvailableCorrect && tc17.verifyStateConsistency()) {
+            System.out.println(
+                    "TC17: Java Stream API (Sorted, Filtered Search, Available List) -> PASSED"
+            );
+            passed++;
+        } else {
+            System.out.println(
+                    "TC17: Java Stream API -> FAILED"
             );
         }
 

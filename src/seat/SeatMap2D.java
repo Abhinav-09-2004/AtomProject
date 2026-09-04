@@ -1,3 +1,10 @@
+package seat;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 /**
  * Custom 2D Data Structure representing a Movie Theater Seat Layout.
  *
@@ -207,25 +214,51 @@ public class SeatMap2D {
     }
 
     /**
-     * Counts all booked seats in the matrix.
+     * Counts all booked seats in the matrix using Java Stream API.
      *
      * Time Complexity: O(rows * cols)
      */
     public int getBookedCount() {
+        return (int) IntStream.range(0, rows)
+                .flatMap(r -> IntStream.range(0, cols).filter(c -> grid[r][c] == BOOKED))
+                .count();
+    }
 
-        int count = 0;
+    /**
+     * Counts all available seats in the matrix using Java Stream API.
+     *
+     * Time Complexity: O(rows * cols)
+     */
+    public int getAvailableCount() {
+        return (int) IntStream.range(0, rows)
+                .flatMap(r -> IntStream.range(0, cols).filter(c -> grid[r][c] == AVAILABLE))
+                .count();
+    }
 
-        for (int r = 0; r < rows; r++) {
+    /**
+     * Returns a List of formatted seat IDs (e.g. "A1", "B2") that are currently available.
+     * Uses Java Stream API.
+     */
+    public List<String> getAvailableSeatsList() {
+        return IntStream.range(0, rows)
+                .boxed()
+                .flatMap(r -> IntStream.range(0, cols)
+                        .filter(c -> grid[r][c] == AVAILABLE)
+                        .mapToObj(c -> "" + (char) ('A' + r) + (c + 1)))
+                .collect(Collectors.toList());
+    }
 
-            for (int c = 0; c < cols; c++) {
-
-                if (grid[r][c] == BOOKED) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
+    /**
+     * Returns a List of formatted seat IDs (e.g. "A1", "B2") that are currently booked.
+     * Uses Java Stream API.
+     */
+    public List<String> getBookedSeatsList() {
+        return IntStream.range(0, rows)
+                .boxed()
+                .flatMap(r -> IntStream.range(0, cols)
+                        .filter(c -> grid[r][c] == BOOKED)
+                        .mapToObj(c -> "" + (char) ('A' + r) + (c + 1)))
+                .collect(Collectors.toList());
     }
 
     /**

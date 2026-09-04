@@ -1,6 +1,11 @@
+package app;
+
+
 
 import java.util.Map;
 import java.util.Scanner;
+
+import booking.BookingManager;
 
 /**
  * Main Console Application for Movie Ticket Booking System (Java + DSA Assessment).
@@ -128,7 +133,7 @@ public class MovieBookingApp {
     }
 
     /**
-     * Handles seat booking.
+     * Handles seat booking using custom exception handling.
      */
     private void handleBookSeat() {
 
@@ -140,16 +145,10 @@ public class MovieBookingApp {
         System.out.print("Enter Customer Name: ");
         String customerName = scanner.nextLine();
 
-        if (customerName.trim().isEmpty()) {
-            printError("Customer name cannot be empty.");
-            return;
-        }
-
         System.out.println("\nProcessing booking request...");
 
-        boolean success = bookingManager.bookSeat(seatId, customerName);
-
-        if (success) {
+        try {
+            bookingManager.bookSeatWithException(seatId, customerName);
 
             String normalizedSeatId = normalizeSeatId(seatId);
             String normalizedCustomerName = customerName.trim();
@@ -163,11 +162,17 @@ public class MovieBookingApp {
                             "Status", "CONFIRMED [X]"
                     )
             );
+        } catch (BookingManager.InvalidCustomerException e) {
+            printError(e.getMessage());
+        } catch (BookingManager.InvalidSeatException e) {
+            printError(e.getMessage());
+        } catch (BookingManager.SeatAlreadyBookedException e) {
+            printError(e.getMessage());
         }
     }
 
     /**
-     * Handles cancellation of an existing booking.
+     * Handles cancellation of an existing booking using custom exception handling.
      */
     private void handleCancelBooking() {
 
@@ -178,11 +183,6 @@ public class MovieBookingApp {
 
         String normalizedId = normalizeSeatId(seatId);
 
-        if (normalizedId.isEmpty()) {
-            printError("Seat ID cannot be empty.");
-            return;
-        }
-
         /*
          * Get the customer before cancellation because the mapping
          * is removed by BookingManager during cancellation.
@@ -192,9 +192,8 @@ public class MovieBookingApp {
 
         System.out.println("\nProcessing cancellation request...");
 
-        boolean success = bookingManager.cancelSeat(seatId);
-
-        if (success) {
+        try {
+            bookingManager.cancelSeatWithException(seatId);
 
             printSuccessSummary(
                     "CANCELLATION CONFIRMED",
@@ -205,6 +204,10 @@ public class MovieBookingApp {
                             "Status", "RELEASED TO AVAILABLE [O]"
                     )
             );
+        } catch (BookingManager.InvalidSeatException e) {
+            printError(e.getMessage());
+        } catch (BookingManager.SeatNotBookedException e) {
+            printError(e.getMessage());
         }
     }
 

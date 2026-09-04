@@ -1,8 +1,21 @@
+package test;
+
 import java.util.Map;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import booking.BookingManager;
+import booking.BookingManager.InvalidCustomerException;
+import booking.BookingManager.InvalidSeatException;
+import booking.BookingManager.InvalidTheaterDimensionsException;
+import booking.BookingManager.MovieBookingException;
+import booking.BookingManager.SeatAlreadyBookedException;
+import booking.BookingManager.SeatNotBookedException;
+import seat.SeatMap2D;
 
 /**
- * Hostile QA Test Suite designed to rigorously stress-test the system across 17 test cases.
- * Refactored for complete Test Isolation.
+ * Hostile QA Test Suite designed to rigorously stress-test the system across 20 test cases.
+ * Refactored for complete Test Isolation, Custom Exception Assertions, and Stream API validation.
  */
 public class HostileQATestSuite {
     private static int passedCount = 0;
@@ -14,7 +27,7 @@ public class HostileQATestSuite {
 
     public static void main(String[] args) {
         System.out.println("==========================================================================");
-        System.out.println(" 🏴‍☠️ HOSTILE QA STRESS TEST & EVALUATOR AUDIT SUITE (17 SCENARIOS)");
+        System.out.println(" 🏴‍☠️ HOSTILE QA STRESS TEST & EVALUATOR AUDIT SUITE (20 SCENARIOS)");
         System.out.println("==========================================================================\n");
 
         // 1. Double booking
@@ -159,13 +172,60 @@ public class HostileQATestSuite {
             return manager.verifyStateConsistency();
         });
 
+        // 18. Custom Exception Validation: InvalidCustomerException & InvalidSeatException
+        runTest(18, "Strict Exception Throwing: Invalid Customer & Seat", () -> {
+            BookingManager manager = createManager();
+            boolean caughtCustomer = false;
+            boolean caughtSeat = false;
+            try {
+                manager.bookSeatWithException("A1", "");
+            } catch (InvalidCustomerException e) {
+                caughtCustomer = true;
+            }
+            try {
+                manager.bookSeatWithException("ZZ9", "ValidName");
+            } catch (InvalidSeatException e) {
+                caughtSeat = true;
+            }
+            return caughtCustomer && caughtSeat && manager.verifyStateConsistency();
+        });
+
+        // 19. Custom Exception Validation: SeatAlreadyBooked & SeatNotBooked
+        runTest(19, "Strict Exception Throwing: Double Book & Unbooked Cancel", () -> {
+            BookingManager manager = createManager();
+            manager.bookSeat("A1", "FirstUser");
+            boolean caughtDouble = false;
+            boolean caughtUnbooked = false;
+            try {
+                manager.bookSeatWithException("A1", "SecondUser");
+            } catch (SeatAlreadyBookedException e) {
+                caughtDouble = true;
+            }
+            try {
+                manager.cancelSeatWithException("E8"); // Not booked
+            } catch (SeatNotBookedException e) {
+                caughtUnbooked = true;
+            }
+            return caughtDouble && caughtUnbooked && manager.verifyStateConsistency();
+        });
+
+        // 20. Stream API Batch Operations & Filtered Map Invariant
+        runTest(20, "Stream API Filter, Sort, and Available Set Invariant", () -> {
+            BookingManager manager = createManager();
+            IntStream.rangeClosed(1, 5).forEach(i -> manager.bookSeat("A" + i, "VIP_Customer"));
+            List<String> sortedBooked = manager.getSortedBookedSeats();
+            Map<String, String> vipBookings = manager.searchBookingsByCustomer("VIP");
+            List<String> availableSeats = manager.getAllAvailableSeatIds();
+            return sortedBooked.size() == 5 && vipBookings.size() == 5 && availableSeats.size() == 35 && manager.verifyStateConsistency();
+        });
+
         System.out.println("\n==========================================================================");
-        System.out.println(" QA SUMMARY: " + passedCount + " / 17 PASSED | " + failedCount + " FAILED");
+        System.out.println(" QA SUMMARY: " + passedCount + " / 20 PASSED | " + failedCount + " FAILED");
         System.out.println("==========================================================================");
     }
 
     private static void runTest(int testNum, String description, TestAction action) {
-        System.out.printf("Test %02d: %-50s ", testNum, description);
+        System.out.printf("Test %02d: %-55s ", testNum, description);
         try {
             boolean success = action.execute();
             if (success) {
