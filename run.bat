@@ -6,7 +6,7 @@ echo Compiling the project...
 if exist bin rmdir /s /q bin
 mkdir bin
 
-javac -d bin src\*.java
+javac -sourcepath src -d bin src\seat\*.java src\booking\*.java src\app\*.java src\test\*.java
 
 if errorlevel 1 (
     echo.
@@ -21,6 +21,6 @@ echo.
 echo Starting Movie Booking System...
 echo.
 
-java -cp bin MovieBookingApp
+java -cp bin app.MovieBookingApp
 
 pause

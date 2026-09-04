@@ -1,5 +1,13 @@
+package app;
+
 import java.util.Map;
 import java.util.Scanner;
+
+import booking.BookingManager;
+import booking.BookingManager.InvalidCustomerException;
+import booking.BookingManager.InvalidSeatException;
+import booking.BookingManager.SeatAlreadyBookedException;
+import booking.BookingManager.SeatNotBookedException;
 
 /**
  * Main Console Application for Movie Ticket Booking System (Java + DSA Assessment).
@@ -156,11 +164,11 @@ public class MovieBookingApp {
                             "Status", "CONFIRMED [X]"
                     )
             );
-        } catch (BookingManager.InvalidCustomerException e) {
+        } catch (InvalidCustomerException e) {
             printError(e.getMessage());
-        } catch (BookingManager.InvalidSeatException e) {
+        } catch (InvalidSeatException e) {
             printError(e.getMessage());
-        } catch (BookingManager.SeatAlreadyBookedException e) {
+        } catch (SeatAlreadyBookedException e) {
             printError(e.getMessage());
         }
     }
@@ -198,9 +206,9 @@ public class MovieBookingApp {
                             "Status", "RELEASED TO AVAILABLE [O]"
                     )
             );
-        } catch (BookingManager.InvalidSeatException e) {
+        } catch (InvalidSeatException e) {
             printError(e.getMessage());
-        } catch (BookingManager.SeatNotBookedException e) {
+        } catch (SeatNotBookedException e) {
             printError(e.getMessage());
         }
     }

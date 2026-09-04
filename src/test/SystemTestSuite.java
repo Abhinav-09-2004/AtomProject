@@ -1,5 +1,15 @@
+package test;
+
 import java.util.List;
 import java.util.Map;
+
+import booking.BookingManager;
+import booking.BookingManager.InvalidCustomerException;
+import booking.BookingManager.InvalidSeatException;
+import booking.BookingManager.MovieBookingException;
+import booking.BookingManager.SeatAlreadyBookedException;
+import booking.BookingManager.SeatNotBookedException;
+import seat.SeatMap2D;
 
 /**
  * Automated System Test Suite for the Movie Ticket Booking System.
@@ -409,7 +419,7 @@ public class SystemTestSuite {
         boolean threwInvalidCustomer = false;
         try {
             tc13.bookSeatWithException("A1", "   ");
-        } catch (BookingManager.InvalidCustomerException e) {
+        } catch (InvalidCustomerException e) {
             threwInvalidCustomer = true;
         } catch (Exception e) {
             threwInvalidCustomer = false;
@@ -434,7 +444,7 @@ public class SystemTestSuite {
         boolean threwInvalidSeat = false;
         try {
             tc14.bookSeatWithException("Z99", "Customer");
-        } catch (BookingManager.InvalidSeatException e) {
+        } catch (InvalidSeatException e) {
             threwInvalidSeat = true;
         } catch (Exception e) {
             threwInvalidSeat = false;
@@ -460,7 +470,7 @@ public class SystemTestSuite {
         try {
             tc15.bookSeatWithException("A1", "Alice");
             tc15.bookSeatWithException("A1", "Bob");
-        } catch (BookingManager.SeatAlreadyBookedException e) {
+        } catch (SeatAlreadyBookedException e) {
             threwDoubleBooking = true;
         } catch (Exception e) {
             threwDoubleBooking = false;
@@ -485,7 +495,7 @@ public class SystemTestSuite {
         boolean threwSeatNotBooked = false;
         try {
             tc16.cancelSeatWithException("B3");
-        } catch (BookingManager.SeatNotBookedException e) {
+        } catch (SeatNotBookedException e) {
             threwSeatNotBooked = true;
         } catch (Exception e) {
             threwSeatNotBooked = false;
